@@ -49,20 +49,29 @@
         <section class="pages" id="pagesArea" aria-hidden="true">
           <nav class="index-panel parchment" id="indexPanel">
             <h2>Índice do Grimório</h2>
-            <ol id="indexList"></ol>
+            <div class="index-scroll">
+              <ol id="indexList"></ol>
+            </div>
+            <div class="index-actions">
+              <button id="addRecipeButton" type="button">+ Adicionar Receita</button>
+            </div>
           </nav>
 
           <article class="recipe-panel parchment" id="recipePanel">
-            <header>
-              <h2 id="recipeTitle">Selecione uma receita</h2>
-              <p id="recipeTagline">Navegue pelo índice para ler ou registrar.</p>
+            <header class="recipe-header">
+              <div>
+                <h2 id="recipeTitle">Selecione uma receita</h2>
+                <p id="recipeTagline">Navegue pelo índice para ler ou registrar.</p>
+              </div>
+              <div class="recipe-controls">
+                <button id="editRecipeButton" type="button">Editar</button>
+                <button id="deleteRecipeButton" type="button">Excluir</button>
+              </div>
             </header>
 
             <section id="recipeContent" class="recipe-content"></section>
 
-            <hr />
-
-            <section class="register-area">
+            <section class="register-area is-hidden" id="registerArea">
               <h3>Nova Página de Receita</h3>
               <form id="recipeForm">
                 <div class="form-row">
@@ -100,7 +109,15 @@
                   <textarea id="newTips" name="newTips" rows="4"></textarea>
                 </div>
 
-                <button type="submit">Adicionar ao Índice</button>
+                <div class="form-row">
+                  <label for="newPhoto">Imagem da receita (URL)</label>
+                  <input id="newPhoto" name="newPhoto" placeholder="https://..." />
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" id="saveRecipeButton">Adicionar ao Índice</button>
+                  <button type="button" id="cancelFormButton" class="secondary">Cancelar</button>
+                </div>
               </form>
             </section>
           </article>

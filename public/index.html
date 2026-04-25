@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grimório Aromático • Minerva Moore</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Marcellus&family=Parisienne&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="scene">
+      <main id="book" class="book is-locked" aria-live="polite">
+        <section class="cover" id="coverPage">
+          <div class="ornament-frame"></div>
+          <div class="cover-content">
+            <p class="seal">Minerva Moore</p>
+            <h1>Grimório Aromático</h1>
+            <p class="subtitle">Essências, Receitas & Memórias</p>
+
+            <form id="unlockForm" class="lock-form">
+              <label for="password">Palavra de Acesso</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Digite a senha"
+                autocomplete="current-password"
+                required
+              />
+              <button type="submit">Abrir o Grimório</button>
+              <p id="authMessage" role="status"></p>
+            </form>
+          </div>
+          <div class="logo-area" title="Logotipo Minerva Moore">
+            <img
+              id="brandLogo"
+              src="/assets/logo-minerva.png"
+              alt="Logotipo Minerva Moore"
+            />
+            <span id="logoFallback">✶ Minerva Moore ✶</span>
+          </div>
+        </section>
+
+        <section class="pages" id="pagesArea" aria-hidden="true">
+          <nav class="index-panel parchment" id="indexPanel">
+            <h2>Índice do Grimório</h2>
+            <ol id="indexList"></ol>
+          </nav>
+
+          <article class="recipe-panel parchment" id="recipePanel">
+            <header>
+              <h2 id="recipeTitle">Selecione uma receita</h2>
+              <p id="recipeTagline">Navegue pelo índice para ler ou registrar.</p>
+            </header>
+
+            <section id="recipeContent" class="recipe-content"></section>
+
+            <hr />
+
+            <section class="register-area">
+              <h3>Nova Página de Receita</h3>
+              <form id="recipeForm">
+                <div class="form-row">
+                  <label for="newTitle">Título</label>
+                  <input id="newTitle" name="newTitle" required />
+                </div>
+
+                <div class="form-row">
+                  <label for="newProfile">Perfil olfativo</label>
+                  <input id="newProfile" name="newProfile" placeholder="Ex.: cítrico, floral" />
+                </div>
+
+                <div class="form-row">
+                  <label for="newBase">Base</label>
+                  <input id="newBase" name="newBase" placeholder="Ex.: 40ml álcool de cereais" />
+                </div>
+
+                <div class="form-row">
+                  <label for="newTop">Notas de topo</label>
+                  <textarea id="newTop" name="newTop" rows="2"></textarea>
+                </div>
+
+                <div class="form-row">
+                  <label for="newMiddle">Notas de corpo</label>
+                  <textarea id="newMiddle" name="newMiddle" rows="2"></textarea>
+                </div>
+
+                <div class="form-row">
+                  <label for="newBaseNotes">Notas de fundo</label>
+                  <textarea id="newBaseNotes" name="newBaseNotes" rows="2"></textarea>
+                </div>
+
+                <div class="form-row">
+                  <label for="newTips">Anotações, maturação e observações</label>
+                  <textarea id="newTips" name="newTips" rows="4"></textarea>
+                </div>
+
+                <button type="submit">Adicionar ao Índice</button>
+              </form>
+            </section>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

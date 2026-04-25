@@ -63,6 +63,7 @@ const editRecipeButton = document.getElementById('editRecipeButton');
 const deleteRecipeButton = document.getElementById('deleteRecipeButton');
 const cancelFormButton = document.getElementById('cancelFormButton');
 const saveRecipeButton = document.getElementById('saveRecipeButton');
+const lockButtons = Array.from(document.querySelectorAll('[data-action="lock-book"]'));
 
 const brandLogo = document.getElementById('brandLogo');
 const logoFallback = document.getElementById('logoFallback');
@@ -70,6 +71,7 @@ const logoFallback = document.getElementById('logoFallback');
 let recipes = loadRecipes();
 let selectedRecipeId = recipes[0]?.id || null;
 let editingRecipeId = null;
+let accessMode = 'crud';
 
 function loadRecipes() {
   const saved = localStorage.getItem(storageKey);
@@ -86,6 +88,40 @@ function saveRecipes() {
   localStorage.setItem(storageKey, JSON.stringify(recipes));
 }
 
+function isFormVisible() {
+  return !registerArea.classList.contains('is-hidden');
+}
+
+function closeForm() {
+  registerArea.classList.add('is-hidden');
+  editingRecipeId = null;
+  recipeForm.reset();
+  saveRecipeButton.textContent = 'Adicionar ao Índice';
+}
+
+function confirmCloseForm() {
+  if (!isFormVisible()) return true;
+  const shouldCancel = window.confirm('Cancelar o cadastro/edição atual e descartar as alterações?');
+  if (!shouldCancel) return false;
+  closeForm();
+  return true;
+}
+
+function runWithFormConfirmation(action) {
+  if (!confirmCloseForm()) return;
+  action();
+}
+
+function updateModeUI() {
+  const readOnly = accessMode === 'read';
+  addRecipeButton.hidden = readOnly;
+  editRecipeButton.hidden = readOnly;
+  deleteRecipeButton.hidden = readOnly;
+  recipeTagline.textContent = readOnly
+    ? 'Modo de visualização: alterações bloqueadas.'
+    : recipeTagline.textContent;
+}
+
 function renderIndex() {
   indexList.innerHTML = '';
 
@@ -93,8 +129,9 @@ function renderIndex() {
     const li = document.createElement('li');
     li.classList.toggle('is-active', recipe.id === selectedRecipeId);
     const button = document.createElement('button');
+    button.type = 'button';
     button.textContent = `${i + 1}. ${recipe.title}`;
-    button.addEventListener('click', () => openRecipe(recipe.id));
+    button.addEventListener('click', () => runWithFormConfirmation(() => openRecipe(recipe.id)));
     li.appendChild(button);
     indexList.appendChild(li);
   });
@@ -122,7 +159,10 @@ function renderRecipe(recipe) {
   }
 
   recipeTitle.textContent = recipe.title;
-  recipeTagline.textContent = recipe.profile || 'Registro aromático';
+  recipeTagline.textContent =
+    accessMode === 'read'
+      ? 'Modo de visualização: alterações bloqueadas.'
+      : recipe.profile || 'Registro aromático';
 
   recipeContent.innerHTML = `
     <div class="recipe-photo">
@@ -157,6 +197,8 @@ function openRecipe(recipeId) {
 }
 
 function openForm(recipe = null) {
+  if (accessMode === 'read') return;
+
   registerArea.classList.remove('is-hidden');
   recipeForm.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 
@@ -179,11 +221,13 @@ function openForm(recipe = null) {
   recipeForm.reset();
 }
 
-function closeForm() {
-  registerArea.classList.add('is-hidden');
-  editingRecipeId = null;
-  recipeForm.reset();
-  saveRecipeButton.textContent = 'Adicionar ao Índice';
+function lockBook() {
+  closeForm();
+  unlockForm.reset();
+  authMessage.textContent = 'Grimório trancado.';
+  pagesArea.setAttribute('aria-hidden', 'true');
+  book.classList.remove('is-open');
+  book.classList.add('is-locked');
 }
 
 unlockForm.addEventListener('submit', async (event) => {
@@ -204,10 +248,17 @@ unlockForm.addEventListener('submit', async (event) => {
       return;
     }
 
-    authMessage.textContent = 'Acesso permitido. Abrindo as páginas...';
+    const result = await response.json();
+    accessMode = result.mode === 'read' ? 'read' : 'crud';
+
+    authMessage.textContent =
+      accessMode === 'read'
+        ? 'Acesso de visualização concedido. Abrindo as páginas...'
+        : 'Acesso completo concedido. Abrindo as páginas...';
     book.classList.remove('is-locked');
     book.classList.add('is-open');
     pagesArea.setAttribute('aria-hidden', 'false');
+    updateModeUI();
     renderIndex();
     openRecipe(selectedRecipeId);
   } catch (error) {
@@ -246,29 +297,39 @@ recipeForm.addEventListener('submit', (event) => {
   closeForm();
 });
 
-addRecipeButton.addEventListener('click', () => openForm());
+addRecipeButton.addEventListener('click', () => runWithFormConfirmation(() => openForm()));
 
 editRecipeButton.addEventListener('click', () => {
-  const recipe = recipes.find((item) => item.id === selectedRecipeId);
-  if (recipe) openForm(recipe);
+  runWithFormConfirmation(() => {
+    const recipe = recipes.find((item) => item.id === selectedRecipeId);
+    if (recipe) openForm(recipe);
+  });
 });
 
 deleteRecipeButton.addEventListener('click', () => {
-  const recipe = recipes.find((item) => item.id === selectedRecipeId);
-  if (!recipe) return;
+  runWithFormConfirmation(() => {
+    const recipe = recipes.find((item) => item.id === selectedRecipeId);
+    if (!recipe) return;
 
-  const shouldDelete = window.confirm(`Excluir a receita "${recipe.title}"?`);
-  if (!shouldDelete) return;
+    const shouldDelete = window.confirm(`Excluir a receita "${recipe.title}"?`);
+    if (!shouldDelete) return;
 
-  recipes = recipes.filter((item) => item.id !== selectedRecipeId);
-  saveRecipes();
-  selectedRecipeId = recipes[0]?.id || null;
-  renderIndex();
-  openRecipe(selectedRecipeId);
-  closeForm();
+    recipes = recipes.filter((item) => item.id !== selectedRecipeId);
+    saveRecipes();
+    selectedRecipeId = recipes[0]?.id || null;
+    renderIndex();
+    openRecipe(selectedRecipeId);
+    closeForm();
+  });
 });
 
-cancelFormButton.addEventListener('click', () => closeForm());
+cancelFormButton.addEventListener('click', () => {
+  confirmCloseForm();
+});
+
+lockButtons.forEach((button) => {
+  button.addEventListener('click', () => runWithFormConfirmation(lockBook));
+});
 
 brandLogo.addEventListener('error', () => {
   brandLogo.style.display = 'none';

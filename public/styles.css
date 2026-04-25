@@ -6,10 +6,39 @@
   --parchment: #efe0be;
   --ink: #18120f;
   --shadow: rgba(0, 0, 0, 0.3);
+  --scroll-track: #dbc79d;
+  --scroll-thumb: #8b6f42;
+  --scroll-thumb-hover: #6f5733;
 }
 
 * {
   box-sizing: border-box;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, #e8d7b4, #cfb784);
+  border-radius: 20px;
+  border: 1px solid rgba(110, 83, 42, 0.35);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #9b7a45, var(--scroll-thumb));
+  border-radius: 20px;
+  border: 2px solid #d7c293;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #876634, var(--scroll-thumb-hover));
 }
 
 body {
@@ -265,6 +294,11 @@ textarea,
   border-radius: 7px;
   padding: 9px 12px;
   font-family: inherit;
+}
+
+.lock-button {
+  background: linear-gradient(180deg, #8b6f42, #6e5531) !important;
+  color: #f7ecd1 !important;
 }
 
 #indexList li.is-active button {
